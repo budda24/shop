@@ -10,8 +10,12 @@ class ProductsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final producs = Provider.of<Products>(context);
+    /*determin whitch list to take*/
+    final displayProducs = producs.isFavorite
+        ?producs.favoriteProducts
+        :producs.products;
     return GridView.builder(
-        itemCount: producs.products.length,
+        itemCount: displayProducs.length,
         padding: EdgeInsets.all(10),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -20,8 +24,9 @@ class ProductsGrid extends StatelessWidget {
           mainAxisSpacing: 15,
         ),
         itemBuilder: (_, index) {
-          return ChangeNotifierProvider(
-              create: (context) => producs.products[index],
+          /*creating a seprate provider for each product used .value to ommit the disolve method called switching the tabs*/
+          return ChangeNotifierProvider.value(
+              value:displayProducs[index],
               child: ProductItem());
         });
   }

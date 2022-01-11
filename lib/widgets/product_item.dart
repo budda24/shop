@@ -38,6 +38,7 @@ class ProductItem extends StatelessWidget {
                     )
                   : Icon(Icons.favorite_outlined, color: kColorMain,),
               onPressed: () {
+                /*switching the isFavorite value and attaching listener*/
                 product.toggleFavorite();
               },
             ),
@@ -53,7 +54,9 @@ class ProductItem extends StatelessWidget {
                 Icons.shopping_cart,
                 color: kColorMain,
               ),
-              onPressed: () {},
+              onPressed: () {
+                /*product.toggleFavorite();*/
+              },
             )),
       ),
     );

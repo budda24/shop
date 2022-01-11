@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:shop/providers/product.dart';
+
 
 class Products with ChangeNotifier{
 
+  /*getter for the private class _products*/
   List<Product> get products{
     print(_products[0]);
     return [..._products];
@@ -44,11 +46,31 @@ class Products with ChangeNotifier{
     ),
   ];
 
+ bool isFavorite = false;
+ void toggleFavorites(bool page){
+
+   isFavorite = page;
+   notifyListeners();
+ }
+
+  /*favorite Products*/
+  List<Product> favoriteProducts = [];
+  addFavorite(){
+    /*products.firstWhere((element) => element.id == id);*/
+    /*if(!favoriteProducts.any((element) => element.id == id))*/
+      favoriteProducts= products.where((element) => element.isFavorite == true).toList();
+
+    notifyListeners();
+  }
+
 
   void addProduct(){
     /*_products.add()*/
     notifyListeners();
   }
+
+
+
 
   Product findById(String id){
     return _products.firstWhere((element) => element.id == id);
