@@ -47,7 +47,7 @@ class Products with ChangeNotifier{
   ];
 
  bool isFavorite = false;
- void toggleFavorites(bool page){
+ void toggleFavoritesMenu(bool page){
 
    isFavorite = page;
    notifyListeners();
@@ -55,11 +55,8 @@ class Products with ChangeNotifier{
 
   /*favorite Products*/
   List<Product> favoriteProducts = [];
-  addFavorite(){
-    /*products.firstWhere((element) => element.id == id);*/
-    /*if(!favoriteProducts.any((element) => element.id == id))*/
+  createFavoriteProducts(){
       favoriteProducts= products.where((element) => element.isFavorite == true).toList();
-
     notifyListeners();
   }
 
@@ -68,10 +65,7 @@ class Products with ChangeNotifier{
     /*_products.add()*/
     notifyListeners();
   }
-
-
-
-
+  
   Product findById(String id){
     return _products.firstWhere((element) => element.id == id);
   }

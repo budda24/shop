@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:shop/providers/products_provider.dart';
-import 'package:shop/widgets/products_grid.dart';
+
+import '../providers/products_provider.dart';
+import '../widgets/badge.dart';
+import '../widgets/products_grid.dart';
+import '../providers/cart_provider.dart';
 import '../const.dart';
 
 enum Page { favorite, allProducts }
@@ -15,6 +18,8 @@ class ProductsScreean extends StatelessWidget {
   Widget build(BuildContext context) {
     /*getting the instance of products from products provider*/
     final productsData = Provider.of<Products>(context);
+
+    final cartData = Provider.of<Cart>(context);
 
     return Scaffold(
         backgroundColor: kColorBacground,
@@ -39,18 +44,21 @@ class ProductsScreean extends StatelessWidget {
                 ),
               ],
               /*toDo how to resolve that problem better*/
-              onSelected: (value){
-               if(value == Page.favorite){
-                 /*boolien wchith determins the list in product_grid*/
-                 productsData.toggleFavorites(true);
-                 /*creatiing a list of favorities in the producs provider*/
-                 productsData.addFavorite();
-               }
-               if(value == Page.allProducts) productsData.toggleFavorites(false);
-
+              onSelected: (value) {
+                if (value == Page.favorite) {
+                  /*boolien wchith determins the list in product_grid*/
+                  productsData.toggleFavoritesMenu(true);
+                  /*creatiing a list of favorities in the producs provider*/
+                  productsData.createFavoriteProducts();
+                }
+                if (value == Page.allProducts)
+                  productsData.toggleFavoritesMenu(false);
               },
             ),
-
+            Badge(
+                child: IconButton(
+                    onPressed: () {}, icon: Icon(Icons.shopping_cart_rounded)),
+                value: cartData.itemQantity.toString())
           ],
           title: Text(
             'Products',
