@@ -26,9 +26,18 @@ class Cart extends ChangeNotifier {
     return _items.length;
   }
 
+  double get totalAmount{
+    double tmpAmount = 0;
+    _items.forEach((key, value) {
+      tmpAmount += value.price *value.quantity;
+    });
+    return tmpAmount;
+  }
+
   addItem(String productId,
       String title,
-      double price,) {
+      double price,
+      ) {
     if (_items.containsKey(productId)) {
       _items.update(
           productId, (value) => CartItem(title: value.title, price:value.price, id:value.id ,quantity:value.quantity +1));
@@ -36,6 +45,11 @@ class Cart extends ChangeNotifier {
       _items.putIfAbsent(productId, () =>
           CartItem(id: DateTime.now().toString(), title: title, price: price));
     }
+    notifyListeners();
+  }
+
+  deleteItem(String id){
+    _items.removeWhere((key, value) => value.id == id);
     notifyListeners();
   }
 }

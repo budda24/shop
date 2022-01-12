@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +8,7 @@ import '../widgets/badge.dart';
 import '../widgets/products_grid.dart';
 import '../providers/cart_provider.dart';
 import '../const.dart';
+import 'cart_screean.dart';
 
 enum Page { favorite, allProducts }
 
@@ -57,7 +59,9 @@ class ProductsScreean extends StatelessWidget {
             ),
             Badge(
                 child: IconButton(
-                    onPressed: () {}, icon: Icon(Icons.shopping_cart_rounded)),
+                    onPressed: () {
+                      Navigator.pushNamed(context, CartScrean.id);
+                    }, icon: Icon(Icons.shopping_cart_rounded)),
                 value: cartData.itemQantity.toString())
           ],
           title: Text(
