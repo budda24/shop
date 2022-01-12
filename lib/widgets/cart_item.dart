@@ -32,7 +32,7 @@ class CartItem extends StatelessWidget {
         key: Key(id),
         direction: DismissDirection.endToStart,
         onDismissed:(direction){
-          cartData.deleteItem(id);
+          cartData.deleteItem(id, price);
         },
         // delete item from the list,
         background: Container(

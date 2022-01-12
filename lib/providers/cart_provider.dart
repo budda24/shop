@@ -34,6 +34,7 @@ class Cart extends ChangeNotifier {
     return tmpAmount;
   }
 
+
   addItem(String productId,
       String title,
       double price,
@@ -48,7 +49,7 @@ class Cart extends ChangeNotifier {
     notifyListeners();
   }
 
-  deleteItem(String id){
+  deleteItem(String id, double price){
     _items.removeWhere((key, value) => value.id == id);
     notifyListeners();
   }

@@ -30,12 +30,51 @@ class ProductDetails extends StatelessWidget {
               color: kColorMain,
             ),
             borderRadius: BorderRadius.all(Radius.circular(20))),
-        child: Center(
-            child: Text(
-          product.description,
-          textAlign: TextAlign.center,
-          style: kTextSubtitle,
-        )),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: double.infinity,
+              height: 300,
+              child: Image.network(
+                product.imageUrl,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 50),
+                  child: CircleAvatar(
+                    radius: 30,
+                    backgroundColor: kColorMain,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      child: FittedBox(
+                        child: Text('\$${product.price.toStringAsFixed(2)}',
+                            style: kText),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 50,
+                ),
+                Text(
+                  product.title,
+                  style: kTextSubtitle,
+                ),
+              ],
+            ),
+            Text(
+              product.description,
+              textAlign: TextAlign.center,
+              style: kTextSubtitle,
+            ),
+          ],
+        ),
       ),
     );
   }
