@@ -5,15 +5,16 @@ import '/providers/products_provider.dart';
 import 'product_item.dart';
 
 class ProductsGrid extends StatelessWidget {
-  const ProductsGrid({Key? key}) : super(key: key);
+  ProductsGrid({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final producs = Provider.of<Products>(context);
     /*determin whitch list to take*/
-    final displayProducs = producs.isFavorite
-        ?producs.favoriteProducts
-        :producs.products;
+    final displayProducs =
+        producs.isFavorite ? producs.favoriteProducts : producs.products;
     return GridView.builder(
         itemCount: displayProducs.length,
         padding: EdgeInsets.all(10),
@@ -26,8 +27,9 @@ class ProductsGrid extends StatelessWidget {
         itemBuilder: (_, index) {
           /*creating a seprate provider for each product used .value to ommit the disolve method called switching the tabs*/
           return ChangeNotifierProvider.value(
-              value:displayProducs[index],
-              child: ProductItem());
+            value: displayProducs[index],
+            child: ProductItem(),
+          );
         });
   }
 }

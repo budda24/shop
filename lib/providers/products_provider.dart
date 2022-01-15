@@ -7,7 +7,7 @@ class Products with ChangeNotifier{
 
   /*getter for the private class _products*/
   List<Product> get products{
-    print(_products[0]);
+    /*print(_products[0]);*/
     return [..._products];
   }
 

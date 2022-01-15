@@ -44,12 +44,12 @@ class Cart extends ChangeNotifier {
           productId, (value) => CartItem(title: value.title, price:value.price, id:value.id ,quantity:value.quantity +1));
     } else {
       _items.putIfAbsent(productId, () =>
-          CartItem(id: DateTime.now().toString(), title: title, price: price));
+          CartItem(id: productId, title: title, price: price));
     }
     notifyListeners();
   }
 
-  deleteItem(String id, double price){
+  deleteItem(String id){
     _items.removeWhere((key, value) => value.id == id);
     notifyListeners();
   }

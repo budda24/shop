@@ -63,7 +63,7 @@ class CartScrean extends StatelessWidget {
                   /*padding: EdgeInsets.all(5),*/
                   itemCount: cartData.itemQantity,
                   itemBuilder: (_, index) {
-                    print(index);
+                    /*print(index);*/
                     return CartItem(
                       id:  cartData.items.values.toList()[index].id,
                       totalAmount: cartData.totalAmount.toStringAsFixed(2),

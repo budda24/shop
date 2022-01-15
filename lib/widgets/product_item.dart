@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,16 +8,22 @@ import '../providers/product.dart';
 import '../screeans/product_details_screan.dart';
 
 class ProductItem extends StatelessWidget {
-  /*final Product product;*/
+   ProductItem({Key? key}) : super(key: key);
 
-  const ProductItem({Key? key /*, required this.product*/
-      })
-      : super(key: key);
+
+
+
+
+  void undoSnacbar(Cart cart, String itemId) {
+    cart.deleteItem(itemId);
+  }
 
   @override
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context);
     final cartData = Provider.of<Cart>(context);
+
+
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -39,9 +44,11 @@ class ProductItem extends StatelessWidget {
               icon: product.isFavorite
                   ? Icon(
                       Icons.favorite,
-
                     )
-                  : Icon(Icons.favorite_outlined, color: kColorMain,),
+                  : Icon(
+                      Icons.favorite_outlined,
+                      color: kColorMain,
+                    ),
               onPressed: () {
                 /*switching the isFavorite value and attaching listener*/
                 product.toggleFavoriteStatus();
@@ -61,6 +68,18 @@ class ProductItem extends StatelessWidget {
               ),
               onPressed: () {
                 cartData.addItem(product.id, product.title, product.price);
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('undo'),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {
+                        undoSnacbar(cartData, product.id);
+                      }
+                    ),
+                  ),
+                );
               },
             )),
       ),
