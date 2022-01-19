@@ -71,7 +71,7 @@ class Products with ChangeNotifier {
     final uri = Uri.parse(
         'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json');
 
-      var response = http.post(
+       return  http.post(
         uri,
         /*headers: {'Content-Type': 'application/json; charset=UTF-8'},*/
         body:
@@ -96,7 +96,7 @@ class Products with ChangeNotifier {
       }).catchError((onError){
         throw onError;
       });
-      return response;
+
     }
 
     Product findById(String id) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../screeans/user_producs_screen.dart';
 import '../providers/products_provider.dart';
 import '../providers/product.dart';
 import '../const.dart';
@@ -101,10 +102,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
   bool _cilcuralIndicator = false;
 
   void _savedForm() {
-    setState(() {
-      _cilcuralIndicator = true;
-    });
+
+
     if (_form.currentState!.validate()) {
+      setState(() {
+        _cilcuralIndicator = true;
+      });
       _form.currentState!.save();
       if (products.products.any((element) => element.id == _editedProduct.id)) {
         products.ubdateProduct(_editedProduct);
@@ -117,6 +120,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
           setState(() {
             _cilcuralIndicator = false;
           });
+        }).catchError((error){
+          print('error cached edit');
+          return showDialog(context: context, builder: (context)=> AlertDialog(
+            title: const  Text('Error occured while saving the data to data base'),
+            actions: [
+              TextButton(onPressed: (){
+                Navigator.of(context).pushNamed(UserProductsScreen.routeName);
+              }, child: Text('OK!'))
+            ],
+          ));
         });
       }
     }
@@ -316,64 +329,3 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 }
 
-class CustomTextFormField extends StatefulWidget {
-  final FocusNode _currantFocN;
-  final String lable;
-  final TextInputType keybordType;
-  final String? initialValue;
-  FocusNode? nextFocN;
-  Function onSaved;
-
-  CustomTextFormField({
-    Key? key,
-    required FocusNode currantFocN,
-    required this.lable,
-    required this.keybordType,
-    required this.onSaved,
-    this.nextFocN,
-    this.initialValue,
-  })  : _currantFocN = currantFocN,
-        super(key: key);
-
-  @override
-  State<CustomTextFormField> createState() => _CustomTextFormFieldState();
-}
-
-class _CustomTextFormFieldState extends State<CustomTextFormField> {
-  @override
-  void setFocus(BuildContext context) {
-    void setState(VoidCallback fn) {
-      widget._currantFocN.unfocus();
-      if (widget.nextFocN != null) {
-        FocusScope.of(context).requestFocus(widget.nextFocN);
-      }
-      super.setState(fn);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      onSaved: (value) {
-        widget.onSaved(value);
-      },
-      initialValue: widget.initialValue,
-      focusNode: widget._currantFocN,
-      onFieldSubmitted: (value) => setFocus,
-      textInputAction: TextInputAction.next,
-      keyboardType: widget.keybordType,
-      decoration: InputDecoration(
-        focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: kColorMain)),
-        labelStyle: TextStyle(
-            color: widget._currantFocN.hasFocus ? kColorMain : Colors.white),
-        label: Text(
-          widget.lable,
-          style: kTextSubtitle,
-        ),
-        focusColor: kColorMain,
-        hoverColor: kColorMain,
-      ),
-    );
-  }
-}
