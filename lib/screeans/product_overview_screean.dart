@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/widgets/app_drawer.dart';
 
 import '../providers/products_provider.dart';
 import '../widgets/badge.dart';
@@ -20,10 +21,9 @@ class ProductsScreean extends StatelessWidget {
     final productsData = Provider.of<Products>(context);
     final cartData = Provider.of<Cart>(context);
 
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
     return Scaffold(
-      key: _scaffoldKey,
+
       backgroundColor: kColorBacground,
       appBar: AppBar(
         actions: [
@@ -73,6 +73,7 @@ class ProductsScreean extends StatelessWidget {
       ),
       body: ProductsGrid(
       ),
+      drawer: AppDrawer(),
     );
   }
 }

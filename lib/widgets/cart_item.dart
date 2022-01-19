@@ -31,8 +31,37 @@ class CartItem extends StatelessWidget {
       child: Dismissible(
         key: Key(id),
         direction: DismissDirection.endToStart,
-        onDismissed:(direction){
-          cartData.deleteItem(id );
+        confirmDismiss: (direction) {
+          return showDialog<bool>(
+            context: context,
+            builder: (BuildContext ctx) {
+              return AlertDialog(
+                title: const Text('Are you sure u want to delete item'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop(true);
+                      cartData.deleteItem(id);
+                    },
+                    child: Text(
+                      'YES',
+                      style: kTextSubtitle,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop(false);
+                    },
+                    child: Text(
+                      'NO',
+                      style: kTextSubtitle,
+                    ),
+                  ),
+                ],
+              );
+            }
+          );
+
         },
         // delete item from the list,
         background: Container(
@@ -43,7 +72,6 @@ class CartItem extends StatelessWidget {
             child: Icon(Icons.restore_from_trash),
           ),
         ),
-
 
         child: ListTile(
           horizontalTitleGap: 20,

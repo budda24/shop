@@ -61,12 +61,22 @@ class Products with ChangeNotifier{
   }
 
 
-  void addProduct(){
-    /*_products.add()*/
+  void addProduct(Product product){
+    _products.add(product);
     notifyListeners();
   }
   
   Product findById(String id){
     return _products.firstWhere((element) => element.id == id);
+  }
+  void deleteProduct (String id){
+    _products.removeWhere((element) => element.id == id);
+    notifyListeners();
+  }
+  void ubdateProduct(Product product){
+    var prodIndex = products.indexWhere((element) => element.id == product.id);
+    _products[prodIndex] = product;
+    notifyListeners();
+
   }
 }

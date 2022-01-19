@@ -47,14 +47,14 @@ class ProductDetails extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 50),
                   child: CircleAvatar(
-                    radius: 30,
+                    radius: 50,
                     backgroundColor: kColorMain,
                     child: Container(
-                      width: 30,
-                      height: 30,
+                      width: 50,
+                      height: 50,
                       child: FittedBox(
                         child: Text('\$${product.price.toStringAsFixed(2)}',
-                            style: kText),
+                            style: kTextTitle),
                       ),
                     ),
                   ),

@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop/const.dart';
-import 'package:shop/providers/cart_provider.dart' show Cart;
+
+import '../const.dart';
+import '../providers/cart_provider.dart' show Cart;
+import 'package:shop/providers/order_provider.dart';
 import 'package:shop/widgets/cart_item.dart';
 
 class CartScrean extends StatelessWidget {
@@ -11,7 +13,7 @@ class CartScrean extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cartData = Provider.of<Cart>(context, listen: false);
+    var cartData = Provider.of<Cart>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kColorMain,
@@ -47,7 +49,13 @@ class CartScrean extends StatelessWidget {
                   ),
                   Spacer(),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Provider.of<Orders>(context, listen: false).addOrder(
+                        cartData.items.values.toList(),
+                        cartData.totalAmount,
+                      );
+                      cartData.clear();
+                    },
                     child: Text(
                       'PLACE ORDER',
                       style: kTextSubtitle,
@@ -65,7 +73,7 @@ class CartScrean extends StatelessWidget {
                   itemBuilder: (_, index) {
                     /*print(index);*/
                     return CartItem(
-                      id:  cartData.items.values.toList()[index].id,
+                      id: cartData.items.values.toList()[index].id,
                       totalAmount: cartData.totalAmount.toStringAsFixed(2),
                       price: cartData.items.values.toList()[index].price,
                       quantity: cartData.items.values.toList()[index].quantity,
