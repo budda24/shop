@@ -37,6 +37,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Product(id: '', title: '', description: '', price: 0, imageUrl: '');
 
 /*controlers form*/
+  final _form = GlobalKey<FormState>();
+
   final imgUrlControler = TextEditingController();
 
   final FocusNode focNtitl = FocusNode();
@@ -96,209 +98,221 @@ class _EditProductScreenState extends State<EditProductScreen> {
     focNimageUrl.addListener(_ubdateUI);
   }
 
-  final _form = GlobalKey<FormState>();
+  bool _cilcuralIndicator = false;
 
   void _savedForm() {
-    if(_form.currentState!.validate()){
+    setState(() {
+      _cilcuralIndicator = true;
+    });
+    if (_form.currentState!.validate()) {
       _form.currentState!.save();
       if (products.products.any((element) => element.id == _editedProduct.id)) {
         products.ubdateProduct(_editedProduct);
+        setState(() {
+          _cilcuralIndicator = false;
+        });
       } else {
-        products.addProduct(_editedProduct);
+        products.addProduct(_editedProduct).then((value) {
+          Navigator.pop(context);
+          setState(() {
+            _cilcuralIndicator = false;
+          });
+        });
       }
-      Navigator.pop(context);
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kColorBacground,
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          'Edit',
-          style: kTextTitle,
+        backgroundColor: kColorBacground,
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            'Edit',
+            style: kTextTitle,
+          ),
+          backgroundColor: kColorMain,
         ),
-        backgroundColor: kColorMain,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      floatingActionButton: FloatingActionButton(
-        onPressed: _savedForm,
-        child: Icon(
-          Icons.save,
-          color: Colors.white,
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Form(
-          key: _form,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextFormField(
-                  onSaved: (value) {
-                    _editedProduct = Product(
-                        id: _editedProduct.id,
-                        title: value??'',
-                        description: _editedProduct.description,
-                        price: _editedProduct.price,
-                        imageUrl: _editedProduct.imageUrl);
-                  },
-                  initialValue: productProperties[ProductE.title],
-                  focusNode: focNtitl,
-                  onFieldSubmitted: (value) => setFocus,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: kColorMain)),
-                    label: Text(
-                      'Title',
-                      style: kTextSubtitle,
-                    ),
-                    focusColor: kColorMain,
-                    hoverColor: kColorMain,
-                  ),
-                ),
-                TextFormField(
-                  validator: (valu) {
-                    if (valu!.isEmpty) {
-                      return 'U have to give the prise';
-                    }
-                    if (double.parse(valu) < 5) {
-                      return 'U have to give at number grater then 5';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _editedProduct = Product(
-                        id: _editedProduct.id,
-                        title: _editedProduct.title,
-                        description: _editedProduct.description,
-                        price: double.parse(value ?? ''),
-                        imageUrl: _editedProduct.imageUrl);
-                  },
-                  initialValue: productProperties[ProductE.price],
-                  focusNode: focNprice,
-                  onFieldSubmitted: (value) =>
-                      setFocus(context, focNprice, focNimageUrl),
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: kColorMain)),
-                    label: Text(
-                      'Price',
-                      style: kTextSubtitle,
-                    ),
-                    focusColor: kColorMain,
-                    hoverColor: kColorMain,
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                  validator: (valu) {
-                    if (valu!.isEmpty) {
-                      return 'U have to give the description';
-                    }
-                    if (valu.length < 10) {
-                      return 'U have to give at least 10 characters';
-                    }
-                    return null;
-                  },
-                  initialValue: productProperties[ProductE.description],
-                  onSaved: (value) {
-                    _editedProduct = Product(
-                        id: _editedProduct.id,
-                        title: _editedProduct.title,
-                        description: value ?? '',
-                        price: _editedProduct.price,
-                        imageUrl: _editedProduct.imageUrl);
-                  },
-                  textInputAction: TextInputAction.newline,
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    labelStyle: kText,
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: kColorMain)),
-                    label: Text(
-                      'Description',
-                      style: kTextSubtitle,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                        margin: EdgeInsets.only(left: 10),
-                        child: imgUrlControler.text.isEmpty
-                            ? Text('There is no image to display',
-                                textAlign: TextAlign.center, style: kText)
-                            : Container(
-                                height: 150,
-                                child: Image.network(
-                                  imgUrlControler.text,
-                                  fit: BoxFit.cover,
-                                ))),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    /*imgUrlControler.text.isEmpty
-                        ?*/
-                    Expanded(
-                      child: TextFormField(
-                        validator: (valu) {
-                          if (valu!.isEmpty) {
-                            return 'U have to give the image url';
-                          }
-                          if (!Uri.parse(valu).isAbsolute) {
-                            return 'U have to give valid image URL';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _editedProduct = Product(
-                              id: _editedProduct.id,
-                              title: _editedProduct.title,
-                              description: _editedProduct.description,
-                              price: _editedProduct.price,
-                              imageUrl: imgUrlControler.text);
-                        },
-                        focusNode: focNimageUrl,
-                        controller: imgUrlControler,
-                        textInputAction: TextInputAction.done,
-                        keyboardType: TextInputType.url,
-                        decoration: InputDecoration(
-                          labelStyle: kText,
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: kColorMain)),
-                          label: Text(
-                            'Image Url',
-                            style: kTextSubtitle,
-                          ),
-                          /*focusColor: kColorMain,
-                          hoverColor: kColorMain,*/
-                        ),
-                      ),
-                    )
-                    /* : Container(),*/
-                  ],
-                ),
-              ],
-            ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+        floatingActionButton: FloatingActionButton(
+          onPressed: _savedForm,
+          child: Icon(
+            Icons.save,
+            color: Colors.white,
           ),
         ),
-      ),
-    );
+        body: !_cilcuralIndicator
+            ? Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Form(
+                  key: _form,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          onSaved: (value) {
+                            _editedProduct = Product(
+                                id: _editedProduct.id,
+                                title: value ?? '',
+                                description: _editedProduct.description,
+                                price: _editedProduct.price,
+                                imageUrl: _editedProduct.imageUrl);
+                          },
+                          initialValue: productProperties[ProductE.title],
+                          focusNode: focNtitl,
+                          onFieldSubmitted: (value) => setFocus,
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: kColorMain)),
+                            label: Text(
+                              'Title',
+                              style: kTextSubtitle,
+                            ),
+                            focusColor: kColorMain,
+                            hoverColor: kColorMain,
+                          ),
+                        ),
+                        TextFormField(
+                          validator: (valu) {
+                            if (valu!.isEmpty) {
+                              return 'U have to give the prise';
+                            }
+                            if (double.parse(valu) < 5) {
+                              return 'U have to give at number grater then 5';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _editedProduct = Product(
+                                id: _editedProduct.id,
+                                title: _editedProduct.title,
+                                description: _editedProduct.description,
+                                price: double.parse(value ?? ''),
+                                imageUrl: _editedProduct.imageUrl);
+                          },
+                          initialValue: productProperties[ProductE.price],
+                          focusNode: focNprice,
+                          onFieldSubmitted: (value) =>
+                              setFocus(context, focNprice, focNimageUrl),
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: kColorMain)),
+                            label: Text(
+                              'Price',
+                              style: kTextSubtitle,
+                            ),
+                            focusColor: kColorMain,
+                            hoverColor: kColorMain,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          validator: (valu) {
+                            if (valu!.isEmpty) {
+                              return 'U have to give the description';
+                            }
+                            if (valu.length < 10) {
+                              return 'U have to give at least 10 characters';
+                            }
+                            return null;
+                          },
+                          initialValue: productProperties[ProductE.description],
+                          onSaved: (value) {
+                            _editedProduct = Product(
+                                id: _editedProduct.id,
+                                title: _editedProduct.title,
+                                description: value ?? '',
+                                price: _editedProduct.price,
+                                imageUrl: _editedProduct.imageUrl);
+                          },
+                          textInputAction: TextInputAction.newline,
+                          maxLines: 4,
+                          decoration: InputDecoration(
+                            labelStyle: kText,
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: kColorMain)),
+                            label: Text(
+                              'Description',
+                              style: kTextSubtitle,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                                margin: EdgeInsets.only(left: 10),
+                                child: imgUrlControler.text.isEmpty
+                                    ? Text('There is no image to display',
+                                        textAlign: TextAlign.center,
+                                        style: kText)
+                                    : Container(
+                                        height: 150,
+                                        child: Image.network(
+                                          imgUrlControler.text,
+                                          fit: BoxFit.cover,
+                                        ))),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            /*imgUrlControler.text.isEmpty
+                        ?*/
+                            Expanded(
+                              child: TextFormField(
+                                validator: (valu) {
+                                  if (valu!.isEmpty) {
+                                    return 'U have to give the image url';
+                                  }
+                                  if (!Uri.parse(valu).isAbsolute) {
+                                    return 'U have to give valid image URL';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  _editedProduct = Product(
+                                      id: _editedProduct.id,
+                                      title: _editedProduct.title,
+                                      description: _editedProduct.description,
+                                      price: _editedProduct.price,
+                                      imageUrl: imgUrlControler.text);
+                                },
+                                focusNode: focNimageUrl,
+                                controller: imgUrlControler,
+                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.url,
+                                decoration: InputDecoration(
+                                  labelStyle: kText,
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: kColorMain)),
+                                  label: Text(
+                                    'Image Url',
+                                    style: kTextSubtitle,
+                                  ),
+                                  /*focusColor: kColorMain,
+                          hoverColor: kColorMain,*/
+                                ),
+                              ),
+                            )
+                            /* : Container(),*/
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            : Center(child: CircularProgressIndicator()));
   }
 }
 

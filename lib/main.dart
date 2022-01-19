@@ -12,7 +12,11 @@ import 'providers/order_provider.dart';
 import 'screeans/orders_screen.dart';
 import 'screeans/user_producs_screen.dart';
 
-void main() => runApp(MyApp());
+
+
+void main() async{
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -55,12 +59,12 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: kColorMain,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'MyShop',
           style: kTextTitle,
         ),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Let\'s build a shop!'),
       ),
     );

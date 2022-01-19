@@ -1,12 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-import 'package:shop/providers/product.dart';
+import '../screeans/edit_product_screen.dart';
+import '../providers/product.dart';
 
-
-class Products with ChangeNotifier{
-
+class Products with ChangeNotifier {
   /*getter for the private class _products*/
-  List<Product> get products{
+  List<Product> get products {
     /*print(_products[0]);*/
     return [..._products];
   }
@@ -46,37 +48,70 @@ class Products with ChangeNotifier{
     ),
   ];
 
- bool isFavorite = false;
- void toggleFavoritesMenu(bool page){
+  bool isFavorite = false;
 
-   isFavorite = page;
-   notifyListeners();
- }
+  void toggleFavoritesMenu(bool page) {
+    isFavorite = page;
+    notifyListeners();
+  }
 
   /*favorite Products*/
   List<Product> favoriteProducts = [];
-  createFavoriteProducts(){
-      favoriteProducts= products.where((element) => element.isFavorite == true).toList();
+
+  createFavoriteProducts() {
+    favoriteProducts =
+        products.where((element) => element.isFavorite == true).toList();
     notifyListeners();
   }
 
+  Future<void> addProduct(Product product){
 
-  void addProduct(Product product){
-    _products.add(product);
-    notifyListeners();
-  }
-  
-  Product findById(String id){
-    return _products.firstWhere((element) => element.id == id);
-  }
-  void deleteProduct (String id){
-    _products.removeWhere((element) => element.id == id);
-    notifyListeners();
-  }
-  void ubdateProduct(Product product){
-    var prodIndex = products.indexWhere((element) => element.id == product.id);
-    _products[prodIndex] = product;
-    notifyListeners();
 
+    /*creating object URI from string*/
+    final uri = Uri.parse(
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+
+      var response = http.post(
+        uri,
+        /*headers: {'Content-Type': 'application/json; charset=UTF-8'},*/
+        body:
+            /*converting map to json*/
+        json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price.toString(),
+          'isFavorite': product.isFavorite.toString(),
+        }),
+
+      ).then((value) {
+        /*when future done creating new product with id from firestore*/
+        Product tmp = Product(id: json.decode(value.body)['name'],
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            imageUrl: product.imageUrl);
+        _products.add(tmp);
+        notifyListeners();
+      }).catchError((onError){
+        throw onError;
+      });
+      return response;
+    }
+
+    Product findById(String id) {
+      return _products.firstWhere((element) => element.id == id);
+    }
+
+    void deleteProduct(String id) {
+      _products.removeWhere((element) => element.id == id);
+      notifyListeners();
+    }
+
+    void ubdateProduct(Product product) {
+      var prodIndex = products.indexWhere((element) =>
+      element.id == product.id);
+      _products[prodIndex] = product;
+      notifyListeners();
+    }
   }
-}
