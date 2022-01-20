@@ -83,6 +83,7 @@ class Products with ChangeNotifier {
           'isFavorite': product.isFavorite.toString(),
         }),
       );
+      print(json.decode(response.body));
       Product tmp = Product(
           id: json.decode(response.body)['name'],
           title: product.title,
@@ -90,6 +91,7 @@ class Products with ChangeNotifier {
           price: product.price,
           imageUrl: product.imageUrl);
       _products.add(tmp);
+      print(tmp.id);
       notifyListeners();
     } catch (error) {
       throw error;
@@ -109,10 +111,26 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  void ubdateProduct(Product product) {
+   Future<void> ubdateProduct(Product product) async {
     var prodIndex = products.indexWhere((element) => element.id == product.id);
+    final ubdateRes =  await _ubdateDocument(product);
     _products[prodIndex] = product;
     notifyListeners();
+    return ubdateRes;
+
+  }
+
+  _ubdateDocument(Product product){
+    return http.patch(Uri.parse(
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products/${product.id}.json'),
+      body: json.encode({
+        'title': product.title,
+        'desFuture<void> cription': product.description,
+        'imageUrl': product.imageUrl,
+        'price': product.price.toString(),
+        'isFavorite': product.isFavorite.toString(),
+      }),
+    ).catchError((onError)=> throw onError);
   }
 
   Future<http.Response> fetchAlbum() {
@@ -123,14 +141,13 @@ class Products with ChangeNotifier {
 
   void featchData() async{
     final data = await fetchAlbum();
-    
    final Map<String, dynamic> decodedData =  jsonDecode(data.body);
+   List<Product> tmp=[];
    decodedData.forEach((key, value) {
-     bool isFavorite = value['isFavorite'].toLowerCase() == 'true';
-     _products.add(Product(id: key, title: value['title'], description: value['description'], price: double.parse(value['price']), imageUrl: value['imageUrl'], isFavorite: isFavorite ));
+      bool isFavorite = value['isFavorite'].toLowerCase() == 'true';
+     tmp.add(Product(id: key, title: value['title'], description: value['description'], price: double.parse(value['price']), imageUrl: value['imageUrl'], isFavorite: isFavorite ));
    });
+   _products = tmp;
    notifyListeners();
-
-
   }
 }

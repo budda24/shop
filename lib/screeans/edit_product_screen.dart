@@ -102,34 +102,49 @@ class _EditProductScreenState extends State<EditProductScreen> {
   bool _cilcuralIndicator = false;
 
   void _savedForm() {
-
-
     if (_form.currentState!.validate()) {
       /*swich on the circulator*/
       setState(() {
         _cilcuralIndicator = true;
       });
       _form.currentState!.save();
-      /*if exist ubdate*/
       if (products.products.any((element) => element.id == _editedProduct.id)) {
-        products.ubdateProduct(_editedProduct);
-        setState(() {
-          _cilcuralIndicator = false;
+        products.ubdateProduct(_editedProduct).then((value) {
+          setState(() {
+            _cilcuralIndicator = false;
+          });
+          Navigator.pop(context);
+        }).catchError((onError) {
+          return showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                    title: const Text(
+                        'Error occured while ubdating the data to data base'),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            /*go back to user product*/
+                            Navigator.of(context)
+                                .pushNamed(UserProductsScreen.routeName);
+                          },
+                          child: Text('OK!'))
+                    ],
+                  ));
         });
-        /*add ne one*/
-      } else {
+        /*add product if don't exist one*/
+      }  else {
         products.addProduct(_editedProduct).then((value) {
           Navigator.pop(context);
           setState(() {
             _cilcuralIndicator = false;
           });
         }).catchError((error){
-          /*show daialog when saving in firestore in products provider trows error*/
+           /*how daialog when saving in firestore in products provider trows error*/
           return showDialog(context: context, builder: (context)=> AlertDialog(
             title: const  Text('Error occured while saving the data to data base'),
             actions: [
               TextButton(onPressed: (){
-                /*go back to user product*/
+                 /*go back to user product */
                 Navigator.of(context).pushNamed(UserProductsScreen.routeName);
               }, child: Text('OK!'))
             ],
@@ -170,7 +185,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         TextFormField(
                           onSaved: (value) {
                             _editedProduct = Product(
-                                id: _editedProduct.id,
+                                id: productProperties[ProductE.id]??'',
                                 title: value ?? '',
                                 description: _editedProduct.description,
                                 price: _editedProduct.price,
@@ -332,4 +347,3 @@ class _EditProductScreenState extends State<EditProductScreen> {
             : Center(child: CircularProgressIndicator()));
   }
 }
-

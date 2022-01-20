@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/products_provider.dart';
 import '../const.dart';
 import '../providers/cart_provider.dart';
 import '../providers/product.dart';
@@ -22,8 +23,7 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context);
     final cartData = Provider.of<Cart>(context);
-
-
+    final products = Provider.of<Products>(context);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -52,6 +52,8 @@ class ProductItem extends StatelessWidget {
               onPressed: () {
                 /*switching the isFavorite value and attaching listener*/
                 product.toggleFavoriteStatus();
+                products.ubdateProduct(product);
+
               },
             ),
             title: Text(
