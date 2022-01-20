@@ -11,10 +11,6 @@ import '../screeans/product_details_screan.dart';
 class ProductItem extends StatelessWidget {
    ProductItem({Key? key}) : super(key: key);
 
-
-
-
-
   void undoSnacbar(Cart cart, String itemId) {
     cart.deleteItem(itemId);
   }

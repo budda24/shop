@@ -106,9 +106,19 @@ class Products with ChangeNotifier {
     return _products.firstWhere((element) => element.id == id);
   }
 
-  void deleteProduct(String id) {
-    _products.removeWhere((element) => element.id == id);
-    notifyListeners();
+  Future deleteProduct(String id) {
+    return http.delete(Uri.parse(
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json')).then((response){
+      if (response.statusCode < 201){
+        _products.removeWhere((element) => element.id == id);
+        notifyListeners();
+      }
+      return response;
+    }).catchError((error){
+      throw error;
+    });
+
+
   }
 
    Future<void> ubdateProduct(Product product) async {
