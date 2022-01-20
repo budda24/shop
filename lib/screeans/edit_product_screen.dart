@@ -105,15 +105,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
 
     if (_form.currentState!.validate()) {
+      /*swich on the circulator*/
       setState(() {
         _cilcuralIndicator = true;
       });
       _form.currentState!.save();
+      /*if exist ubdate*/
       if (products.products.any((element) => element.id == _editedProduct.id)) {
         products.ubdateProduct(_editedProduct);
         setState(() {
           _cilcuralIndicator = false;
         });
+        /*add ne one*/
       } else {
         products.addProduct(_editedProduct).then((value) {
           Navigator.pop(context);
@@ -121,11 +124,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
             _cilcuralIndicator = false;
           });
         }).catchError((error){
-          print('error cached edit');
+          /*show daialog when saving in firestore in products provider trows error*/
           return showDialog(context: context, builder: (context)=> AlertDialog(
             title: const  Text('Error occured while saving the data to data base'),
             actions: [
               TextButton(onPressed: (){
+                /*go back to user product*/
                 Navigator.of(context).pushNamed(UserProductsScreen.routeName);
               }, child: Text('OK!'))
             ],

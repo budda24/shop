@@ -64,38 +64,43 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addProduct(Product product){
+  Future<void> addProduct(Product product) async{
 
-
+  try {
     /*creating object URI from string*/
     final uri = Uri.parse(
         'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+    /*bug body may return cosing null*/
+    final response = await http.post(
+      uri,
+      /*headers: {'Content-Type': 'application/json; charset=UTF-8'},*/
+      body:
+      /*converting map to json*/
+      json.encode({
+        'title': product.title,
+        'description': product.description,
+        'imageUrl': product.imageUrl,
+        'price': product.price.toString(),
+        'isFavorite': product.isFavorite.toString(),
+      }),
 
-       return  http.post(
-        uri,
-        /*headers: {'Content-Type': 'application/json; charset=UTF-8'},*/
-        body:
-            /*converting map to json*/
-        json.encode({
-          'title': product.title,
-          'description': product.description,
-          'imageUrl': product.imageUrl,
-          'price': product.price.toString(),
-          'isFavorite': product.isFavorite.toString(),
-        }),
-
-      ).then((value) {
+    );
+    Product tmp = Product(id: json.decode(response.body)['name'],
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl);
+    _products.add(tmp);
+    notifyListeners();
+  }catch(error){
+    throw error;
+  }
         /*when future done creating new product with id from firestore*/
-        Product tmp = Product(id: json.decode(value.body)['name'],
-            title: product.title,
-            description: product.description,
-            price: product.price,
-            imageUrl: product.imageUrl);
-        _products.add(tmp);
-        notifyListeners();
-      }).catchError((onError){
-        throw onError;
-      });
+
+
+        /*returnig error needed to handle error in edit product*/
+        /*throw onError;*/
+
 
     }
 
