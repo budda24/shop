@@ -14,13 +14,13 @@ class Products with ChangeNotifier {
   }
 
   List<Product> _products = [
-    Product(
+    /*Product(
       id: 'p1',
       title: 'Red Shirt',
       description: 'A red shirt - it is pretty red!',
       price: 29.99,
       imageUrl:
-      'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
+          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
     ),
     Product(
       id: 'p2',
@@ -28,7 +28,7 @@ class Products with ChangeNotifier {
       description: 'A nice pair of trousers.',
       price: 59.99,
       imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
     ),
     Product(
       id: 'p3',
@@ -36,7 +36,7 @@ class Products with ChangeNotifier {
       description: 'Warm and cozy - exactly what you need for the winter.',
       price: 19.99,
       imageUrl:
-      'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
+          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
     ),
     Product(
       id: 'p4',
@@ -44,8 +44,8 @@ class Products with ChangeNotifier {
       description: 'Prepare any meal you want.',
       price: 49.99,
       imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
+    ),*/
   ];
 
   bool isFavorite = false;
@@ -64,59 +64,73 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addProduct(Product product) async{
+  Future<void> addProduct(Product product) async {
+    try {
+      /*creating object URI from string*/
+      final uri = Uri.parse(
+          'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+      /*bug body may return cosing null*/
+      final response = await http.post(
+        uri,
+        /*headers: {'Content-Type': 'application/json; charset=UTF-8'},*/
+        body:
+            /*converting map to json*/
+            json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price.toString(),
+          'isFavorite': product.isFavorite.toString(),
+        }),
+      );
+      Product tmp = Product(
+          id: json.decode(response.body)['name'],
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl);
+      _products.add(tmp);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+    /*when future done creating new product with id from firestore*/
 
-  try {
-    /*creating object URI from string*/
-    final uri = Uri.parse(
-        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json');
-    /*bug body may return cosing null*/
-    final response = await http.post(
-      uri,
-      /*headers: {'Content-Type': 'application/json; charset=UTF-8'},*/
-      body:
-      /*converting map to json*/
-      json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price.toString(),
-        'isFavorite': product.isFavorite.toString(),
-      }),
+    /*returnig error needed to handle error in edit product*/
+    /*throw onError;*/
+  }
 
-    );
-    Product tmp = Product(id: json.decode(response.body)['name'],
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        imageUrl: product.imageUrl);
-    _products.add(tmp);
+  Product findById(String id) {
+    return _products.firstWhere((element) => element.id == id);
+  }
+
+  void deleteProduct(String id) {
+    _products.removeWhere((element) => element.id == id);
     notifyListeners();
-  }catch(error){
-    throw error;
   }
-        /*when future done creating new product with id from firestore*/
 
-
-        /*returnig error needed to handle error in edit product*/
-        /*throw onError;*/
-
-
-    }
-
-    Product findById(String id) {
-      return _products.firstWhere((element) => element.id == id);
-    }
-
-    void deleteProduct(String id) {
-      _products.removeWhere((element) => element.id == id);
-      notifyListeners();
-    }
-
-    void ubdateProduct(Product product) {
-      var prodIndex = products.indexWhere((element) =>
-      element.id == product.id);
-      _products[prodIndex] = product;
-      notifyListeners();
-    }
+  void ubdateProduct(Product product) {
+    var prodIndex = products.indexWhere((element) => element.id == product.id);
+    _products[prodIndex] = product;
+    notifyListeners();
   }
+
+  Future<http.Response> fetchAlbum() {
+    return http.get(Uri.parse(
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json'))
+        .catchError((onError)=> print(onError));
+  }
+
+  void featchData() async{
+    final data = await fetchAlbum();
+    
+   final Map<String, dynamic> decodedData =  jsonDecode(data.body);
+   decodedData.forEach((key, value) {
+     bool isFavorite = value['isFavorite'].toLowerCase() == 'true';
+     _products.add(Product(id: key, title: value['title'], description: value['description'], price: double.parse(value['price']), imageUrl: value['imageUrl'], isFavorite: isFavorite ));
+   });
+   notifyListeners();
+
+
+  }
+}

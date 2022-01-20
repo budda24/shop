@@ -11,15 +11,27 @@ import 'cart_screean.dart';
 
 enum Page { favorite, allProducts }
 
-class ProductsScreean extends StatelessWidget {
+class ProductsScreean extends StatefulWidget {
   const ProductsScreean({Key? key}) : super(key: key);
   static const id = '/Product_screean';
 
+  @override
+  State<ProductsScreean> createState() => _ProductsScreeanState();
+}
+
+class _ProductsScreeanState extends State<ProductsScreean> {
+
+  @override
+  void initState() {
+    Provider.of<Products>(context, listen: false).featchData();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     /*getting the instance of products from products provider*/
     final productsData = Provider.of<Products>(context);
     final cartData = Provider.of<Cart>(context);
+
 
 
     return Scaffold(
