@@ -83,7 +83,7 @@ class Products with ChangeNotifier {
           'isFavorite': product.isFavorite.toString(),
         }),
       );
-      print(json.decode(response.body));
+      /* print(json.decode(response.body)); */
       Product tmp = Product(
           id: json.decode(response.body)['name'],
           title: product.title,
@@ -107,57 +107,66 @@ class Products with ChangeNotifier {
   }
 
   Future deleteProduct(String id) {
-    return http.delete(Uri.parse(
-        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json')).then((response){
-      if (response.statusCode < 201){
+    return http
+        .delete(Uri.parse(
+            'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json'))
+        .then((response) {
+      if (response.statusCode < 201) {
         _products.removeWhere((element) => element.id == id);
         notifyListeners();
       }
       return response;
-    }).catchError((error){
+    }).catchError((error) {
       throw error;
     });
-
-
   }
 
-   Future<void> ubdateProduct(Product product) async {
+  Future<void> ubdateProduct(Product product) async {
     var prodIndex = products.indexWhere((element) => element.id == product.id);
-    final ubdateRes =  await _ubdateDocument(product);
+    final ubdateRes = await _ubdateDocument(product);
     _products[prodIndex] = product;
     notifyListeners();
     return ubdateRes;
-
   }
 
-  _ubdateDocument(Product product){
-    return http.patch(Uri.parse(
-        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products/${product.id}.json'),
-      body: json.encode({
-        'title': product.title,
-        'desFuture<void> cription': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price.toString(),
-        'isFavorite': product.isFavorite.toString(),
-      }),
-    ).catchError((onError)=> throw onError);
+  _ubdateDocument(Product product) {
+    return http
+        .patch(
+          Uri.parse(
+              'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products/${product.id}.json'),
+          body: json.encode({
+            'title': product.title,
+            'desFuture<void> cription': product.description,
+            'imageUrl': product.imageUrl,
+            'price': product.price.toString(),
+            'isFavorite': product.isFavorite.toString(),
+          }),
+        )
+        .catchError((onError) => throw onError);
   }
 
   Future<http.Response> fetchAlbum() {
-    return http.get(Uri.parse(
-        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json'))
-        .catchError((onError)=> print(onError));
+    return http
+        .get(Uri.parse(
+            'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json'))
+        .catchError((onError) => print(onError));
   }
 
-  void featchData() async{
+  void featchData() async {
     final data = await fetchAlbum();
-   final Map<String, dynamic> decodedData =  jsonDecode(data.body);
-   List<Product> tmp=[];
-   decodedData.forEach((key, value) {
+    final Map<String, dynamic> decodedData = jsonDecode(data.body);
+    List<Product> tmp = [];
+    decodedData.forEach((key, value) {
       bool isFavorite = value['isFavorite'].toLowerCase() == 'true';
-     tmp.add(Product(id: key, title: value['title'], description: value['description'], price: double.parse(value['price']), imageUrl: value['imageUrl'], isFavorite: isFavorite ));
-   });
-   _products = tmp;
-   notifyListeners();
+      tmp.add(Product(
+          id: key,
+          title: value['title'],
+          description: value['description'],
+          price: double.parse(value['price']),
+          imageUrl: value['imageUrl'],
+          isFavorite: isFavorite));
+    });
+    _products = tmp;
+    notifyListeners();
   }
 }

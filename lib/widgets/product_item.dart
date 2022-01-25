@@ -9,7 +9,7 @@ import '../providers/product.dart';
 import '../screeans/product_details_screan.dart';
 
 class ProductItem extends StatelessWidget {
-   ProductItem({Key? key}) : super(key: key);
+  ProductItem({Key? key}) : super(key: key);
 
   void undoSnacbar(Cart cart, String itemId) {
     cart.deleteItem(itemId);
@@ -49,7 +49,6 @@ class ProductItem extends StatelessWidget {
                 /*switching the isFavorite value and attaching listener*/
                 product.toggleFavoriteStatus();
                 products.ubdateProduct(product);
-
               },
             ),
             title: Text(
@@ -65,19 +64,29 @@ class ProductItem extends StatelessWidget {
                 color: kColorMain,
               ),
               onPressed: () {
-                cartData.addItem(product.id, product.title, product.price);
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('undo'),
-                    action: SnackBarAction(
-                      label: 'Undo',
-                      onPressed: () {
-                        undoSnacbar(cartData, product.id);
-                      }
+                try {
+                  if (cartData.items.containsKey(product.id)) {
+
+
+                    cartData.ubdateItem(
+                        product, cartData.totalAmount);
+                  } else {
+                    /* print('add item'); */
+                    cartData.addItem(product);
+                  }
+                } finally {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('undo'),
+                      action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () {
+                            undoSnacbar(cartData, product.id);
+                          }),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             )),
       ),

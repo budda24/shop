@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:shop/providers/product.dart';
 
 class CartItem {
   final String id;
   final String title;
-  int quantity;
+  int quantity = 1;
   final double price;
 
   CartItem({
@@ -12,47 +17,99 @@ class CartItem {
     this.quantity = 1,
     required this.price,
   });
+  void addQuantity() {
+    quantity++;
+  }
+
 }
 
 class Cart extends ChangeNotifier {
   Map<String, CartItem> _items = {};
 
-
   Map<String, CartItem> get items {
     return {..._items};
   }
 
-  int get itemQantity{
+  int get itemQantity {
     return _items.length;
   }
 
-  double get totalAmount{
+  double get totalAmount {
     double tmpAmount = 0;
     _items.forEach((key, value) {
-      tmpAmount += value.price *value.quantity;
+      tmpAmount += value.price * value.quantity;
     });
     return tmpAmount;
   }
 
+  Future<void> addItem(Product product) {
+/* using the product id as a key of documemt */
+    final uri = Uri.parse(
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${product.id}.json');
+        /* using patch for creating new document with given id */
+    return http
+        .patch(
+      uri,
+      body: json.encode({
+        'quantity': 1,
+        'title': product.title,
+        'total': product.price.toString(),
+        'price': product.price.toString(),
+      }),
+    )
+        .then((value) {
+      var response = value.body;
 
-  addItem(String productId,
-      String title,
-      double price,
-      ) {
-    if (_items.containsKey(productId)) {
-      _items.update(
-          productId, (value) => CartItem(title: value.title, price:value.price, id:value.id ,quantity:value.quantity +1));
-    } else {
-      _items.putIfAbsent(productId, () =>
-          CartItem(id: productId, title: title, price: price));
-    }
-    notifyListeners();
+      /* adding a element to map with given key */
+      _items.putIfAbsent(
+          product.id,
+          () => CartItem(
+              quantity: 1,
+              id: product.id,
+              title: product.title,
+              price: product.price));
+
+      notifyListeners();
+    });
   }
 
-  deleteItem(String id){
+  Future<void> ubdateItem(
+    Product product,
+    double total,
+
+  )  {
+    //calling a addQuantity on cart item
+    _items[product.id]!.addQuantity();
+
+    final uri = Uri.parse(
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${product.id}.json');
+    return http
+        .patch(
+      uri,
+      body: json.encode({
+        'quantity': _items[product.id]!.quantity,
+        'title': product.title,
+        'total': total,
+        'price': product.price.toString(),
+      }),
+    )
+        .then((value) {
+      _items.update(
+          product.id,
+          (value) => CartItem(
+              title: value.title,
+              price: value.price,
+              id: value.id,
+              quantity:  _items[product.id]!.quantity));
+      notifyListeners();
+    });
+  }
+
+  deleteItem(String id) {
     _items.removeWhere((key, value) => value.id == id);
     notifyListeners();
   }
+
   void clear() {
     _items = {};
     notifyListeners();
