@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../const.dart';
-import '../providers/cart_provider.dart' show Cart;
+import '../providers/cart_provider.dart' show Cart, CartItem;
 import 'package:shop/providers/order_provider.dart';
 import 'package:shop/widgets/cart_item.dart';
 
 class CartScrean extends StatelessWidget {
-  const CartScrean({Key? key}) : super(key: key);
   static const id = '/cart';
-
   @override
   Widget build(BuildContext context) {
     var cartData = Provider.of<Cart>(context);
@@ -72,13 +70,13 @@ class CartScrean extends StatelessWidget {
                   itemCount: cartData.itemQantity,
                   itemBuilder: (_, index) {
                     /*print(index);*/
-                    return CartItem(
+                    return CartItemElement(
+                        cartItem: CartItem(
                       id: cartData.items.values.toList()[index].id,
-                      totalAmount: cartData.totalAmount.toStringAsFixed(2),
                       price: cartData.items.values.toList()[index].price,
                       quantity: cartData.items.values.toList()[index].quantity,
                       title: cartData.items.values.toList()[index].title,
-                    );
+                    ));
                   },
                 ),
               )

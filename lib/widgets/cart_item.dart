@@ -5,20 +5,13 @@ import 'package:provider/provider.dart';
 import 'package:shop/providers/cart_provider.dart';
 import 'package:shop/const.dart';
 
-class CartItem extends StatelessWidget {
-  final String totalAmount;
-  final double price;
-  final int quantity;
-  final String title;
-  final String id;
+class CartItemElement extends StatelessWidget {
+  final CartItem cartItem;
 
-  CartItem({
-    required this.totalAmount,
-    required this.price,
-    required this.quantity,
-    required this.title,
-    required this.id,
-  });
+  CartItemElement({required this.cartItem});
+  double get priceForProduct {
+    return cartItem.price * cartItem.quantity;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,39 +22,37 @@ class CartItem extends StatelessWidget {
         side: BorderSide(width: 2, color: Colors.red),
       ),
       child: Dismissible(
-        key: Key(id),
+        key: Key(cartItem.id),
         direction: DismissDirection.endToStart,
         confirmDismiss: (direction) {
           return showDialog<bool>(
-            context: context,
-            builder: (BuildContext ctx) {
-              return AlertDialog(
-                title: const Text('Are you sure u want to delete item'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop(true);
-                      cartData.deleteItem(id);
-                    },
-                    child: Text(
-                      'YES',
-                      style: kTextSubtitle,
+              context: context,
+              builder: (BuildContext ctx) {
+                return AlertDialog(
+                  title: const Text('Are you sure u want to delete item'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(ctx).pop(true);
+                        cartData.deleteItem(cartItem.id);
+                      },
+                      child: Text(
+                        'YES',
+                        style: kTextSubtitle,
+                      ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop(false);
-                    },
-                    child: Text(
-                      'NO',
-                      style: kTextSubtitle,
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(ctx).pop(false);
+                      },
+                      child: Text(
+                        'NO',
+                        style: kTextSubtitle,
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }
-          );
-
+                  ],
+                );
+              });
         },
         // delete item from the list,
         background: Container(
@@ -83,16 +74,18 @@ class CartItem extends StatelessWidget {
               width: 30,
               height: 30,
               child: FittedBox(
-                child: Text('\$${price.toStringAsFixed(2)}', style: kText),
+                child: Text('\$${cartItem.price.toStringAsFixed(2)}',
+                    style: kText),
               ),
             ),
           ),
           title: Text(
-            title,
+            cartItem.title,
             style: kTextSubtitle,
           ),
-          subtitle: Text((quantity * price).toStringAsFixed(2), style: kText),
-          trailing: Text('X ${quantity.toString()}'),
+          subtitle:
+              Text(priceForProduct.toString(), style: kText),
+          trailing: Text('X ${cartItem.quantity.toString()}'),
         ),
       ),
     );

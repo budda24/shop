@@ -24,6 +24,8 @@ class _ProductsScreeanState extends State<ProductsScreean> {
   @override
   void initState() {
     Provider.of<Products>(context, listen: false).featchData();
+    Provider.of<Cart>(context, listen: false).featchData();
+
     super.initState();
   }
   @override

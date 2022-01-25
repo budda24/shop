@@ -20,7 +20,6 @@ class CartItem {
   void addQuantity() {
     quantity++;
   }
-
 }
 
 class Cart extends ChangeNotifier {
@@ -42,11 +41,35 @@ class Cart extends ChangeNotifier {
     return tmpAmount;
   }
 
+  Future<http.Response> fetchAlbum() {
+    return http
+        .get(Uri.parse(
+            'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts.json'))
+        .catchError((onError) => print(onError));
+  }
+
+  void featchData() async {
+    final response = await fetchAlbum();
+    final Map<String, dynamic> decodedData = jsonDecode(response.body);
+    /* Map<String, CartItem> tmp = {}; */
+    decodedData.forEach((key, value) {
+      /* print('value : ${value['price']}  key: $key'); */
+
+      _items[key] = CartItem(
+          id: key,
+          title: value['title'],
+          price: double.parse(value['price']),
+          quantity: value['quantity']);
+    });
+    notifyListeners();
+    /*  _items = tmp; */
+  }
+
   Future<void> addItem(Product product) {
 /* using the product id as a key of documemt */
     final uri = Uri.parse(
         'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${product.id}.json');
-        /* using patch for creating new document with given id */
+    /* using patch for creating new document with given id */
     return http
         .patch(
       uri,
@@ -76,8 +99,7 @@ class Cart extends ChangeNotifier {
   Future<void> ubdateItem(
     Product product,
     double total,
-
-  )  {
+  ) {
     //calling a addQuantity on cart item
     _items[product.id]!.addQuantity();
 
@@ -100,7 +122,7 @@ class Cart extends ChangeNotifier {
               title: value.title,
               price: value.price,
               id: value.id,
-              quantity:  _items[product.id]!.quantity));
+              quantity: _items[product.id]!.quantity));
       notifyListeners();
     });
   }
