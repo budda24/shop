@@ -94,6 +94,23 @@ class _AuthCardState extends State<AuthCard> {
     'email': '',
     'password': '',
   };
+  Object showAlertDialog(String message) {
+      return showDialog(
+                context: context,
+                builder: (context) =>  AlertDialog(
+        title: Text(message),
+        /* actions: [
+          TextButton(
+              onPressed: () {
+                /*go back to user product*/
+                Navigator.of(context).pop;
+              },
+              child: Text('OK!'))
+        ], */
+      ),
+    );
+  }
+
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
@@ -106,11 +123,18 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      // Log user in
-    } else {
-      Provider.of<Auth>(context, listen: false)
-          .signUp(_authData['email'] ?? '', _authData['password'] ?? '').onError((error, stackTrace) => print(error));
+    try {
+      if (_authMode == AuthMode.Login) {
+        Provider.of<Auth>(context, listen: false)
+            .signIn(_authData['email'] ?? '', _authData['password'] ?? '')
+            .onError((error, stackTrace) => showAlertDialog(error.toString()));
+      } else {
+        Provider.of<Auth>(context, listen: false)
+            .signUp(_authData['email'] ?? '', _authData['password'] ?? '')
+            .onError((error, stackTrace) => showAlertDialog(error.toString()));
+      }
+    } catch (error) {
+      print(error);
     }
     setState(() {
       _isLoading = false;
@@ -197,7 +221,7 @@ class _AuthCardState extends State<AuthCard> {
                   RaisedButton(
                     child:
                         Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
-                    onPressed: _submit,
+                    onPressed:_submit,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

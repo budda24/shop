@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/widgets/app_drawer.dart';
+import 'package:shop/widgets/circular_indicator.dart';
 
 import '../providers/products_provider.dart';
 import '../widgets/badge.dart';
@@ -20,9 +21,11 @@ class ProductsScreean extends StatefulWidget {
 }
 
 class _ProductsScreeanState extends State<ProductsScreean> {
+  bool circularIndicator = false;
   @override
   void initState() {
-    Provider.of<Products>(context, listen: false).featchData();
+    circularIndicator = true;
+    Provider.of<Products>(context, listen: false).featchData().then((value) => circularIndicator = false);
     Provider.of<Cart>(context, listen: false).featchData();
 
     super.initState();
@@ -82,7 +85,7 @@ class _ProductsScreeanState extends State<ProductsScreean> {
         ),
         backgroundColor: kColorMain,
       ),
-      body: ProductsGrid(),
+      body:circularIndicator? CircularndIcator(): ProductsGrid(),
       drawer: AppDrawer(),
     );
   }

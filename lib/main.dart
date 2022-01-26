@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MyShop',
-        initialRoute: AuthScreen.routeName,
+        initialRoute: ProductsScreean.id,
         routes: {
           ProductsScreean.id: (ctx) => ProductsScreean(),
           ProductDetails.id: (ctx) => ProductDetails(),

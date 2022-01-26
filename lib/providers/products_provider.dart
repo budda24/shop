@@ -149,24 +149,33 @@ class Products with ChangeNotifier {
     return http
         .get(Uri.parse(
             'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json'))
-        .catchError((onError) => print(onError));
+        .catchError((onError) => throw onError);
   }
 
-  void featchData() async {
-    final data = await fetchAlbum();
-    final Map<String, dynamic> decodedData = jsonDecode(data.body);
-    List<Product> tmp = [];
-    decodedData.forEach((key, value) {
-      bool isFavorite = value['isFavorite'].toLowerCase() == 'true';
-      tmp.add(Product(
-          id: key,
-          title: value['title'],
-          description: value['description'],
-          price: double.parse(value['price']),
-          imageUrl: value['imageUrl'],
-          isFavorite: isFavorite));
-    });
-    _products = tmp;
-    notifyListeners();
+  Future<void> featchData() async {
+    late http.Response data;
+    try {
+      data = await fetchAlbum();
+    } catch (error) {
+      throw error;
+    } finally {
+      final Map<String, dynamic> decodedData = jsonDecode(data.body);
+      print('decodedData: $decodedData');
+      List<Product> tmp = [];
+      decodedData.forEach((key, value) {
+        bool isFavorite = value['isFavorite'].toLowerCase() == 'true';
+        tmp.add(Product(
+            id: key,
+            title: value['title'],
+            description: value['description'],
+            price: double.parse(value['price']),
+            imageUrl: value['imageUrl'],
+            isFavorite: isFavorite));
+      });
+
+      _products = tmp;
+      notifyListeners();
+    }
+    ;
   }
 }
