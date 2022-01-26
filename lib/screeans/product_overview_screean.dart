@@ -20,7 +20,6 @@ class ProductsScreean extends StatefulWidget {
 }
 
 class _ProductsScreeanState extends State<ProductsScreean> {
-
   @override
   void initState() {
     Provider.of<Products>(context, listen: false).featchData();
@@ -28,16 +27,14 @@ class _ProductsScreeanState extends State<ProductsScreean> {
 
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     /*getting the instance of products from products provider*/
     final productsData = Provider.of<Products>(context);
     final cartData = Provider.of<Cart>(context);
 
-
-
     return Scaffold(
-
       backgroundColor: kColorBacground,
       appBar: AppBar(
         actions: [
@@ -85,8 +82,7 @@ class _ProductsScreeanState extends State<ProductsScreean> {
         ),
         backgroundColor: kColorMain,
       ),
-      body: ProductsGrid(
-      ),
+      body: ProductsGrid(),
       drawer: AppDrawer(),
     );
   }

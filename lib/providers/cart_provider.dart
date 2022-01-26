@@ -128,8 +128,16 @@ class Cart extends ChangeNotifier {
   }
 
   deleteItem(String id) {
-    _items.removeWhere((key, value) => value.id == id);
-    notifyListeners();
+    final uri = Uri.parse(
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${id}.json');
+    http
+        .delete(
+      uri,
+    )
+        .then((value) {
+      _items.removeWhere((key, value) => value.id == id);
+      notifyListeners();
+    });
   }
 
   void clear() {
