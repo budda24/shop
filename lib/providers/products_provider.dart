@@ -64,7 +64,11 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
+  String? token = '';
+  Products({this.token});
+
   Future<void> addProduct(Product product) async {
+
     try {
       /*creating object URI from string*/
       final uri = Uri.parse(
@@ -91,7 +95,7 @@ class Products with ChangeNotifier {
           price: product.price,
           imageUrl: product.imageUrl);
       _products.add(tmp);
-      print(tmp.id);
+
       notifyListeners();
     } catch (error) {
       throw error;
@@ -148,7 +152,7 @@ class Products with ChangeNotifier {
   Future<http.Response> fetchAlbum() {
     return http
         .get(Uri.parse(
-            'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json'))
+            'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$token'))
         .catchError((onError) => throw onError);
   }
 
@@ -160,7 +164,7 @@ class Products with ChangeNotifier {
       throw error;
     } finally {
       final Map<String, dynamic> decodedData = jsonDecode(data.body);
-      print('decodedData: $decodedData');
+      /* print('decodedData: $decodedData'); */
       List<Product> tmp = [];
       decodedData.forEach((key, value) {
         bool isFavorite = value['isFavorite'].toLowerCase() == 'true';

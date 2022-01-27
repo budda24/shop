@@ -63,7 +63,7 @@ class UserProductItem extends StatelessWidget {
                                 ],
                               ));
                         }
-                        print('respons :${response.statusCode}');
+                      
                       } );
                     },
                     color: Theme.of(context).errorColor,
