@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/providers/auth_provider.dart';
 
 import '../screeans/user_producs_screen.dart';
 import '../providers/products_provider.dart';
@@ -45,6 +46,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final FocusNode focNtitl = FocusNode();
   final FocusNode focNprice = FocusNode();
   final FocusNode focNimageUrl = FocusNode();
+
   late Products products;
 
   void setFocus(BuildContext context, FocusNode currant, FocusNode next) {
@@ -102,6 +104,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   bool _cilcuralIndicator = false;
 
   void _savedForm() {
+    var auth = Provider.of<Auth>(context, listen: false);
     if (_form.currentState!.validate()) {
       /*swich on the circulator*/
       setState(() {
@@ -132,23 +135,29 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ));
         });
         /*add product if don't exist one*/
-      }  else {
+      } else {
         products.addProduct(_editedProduct).then((value) {
           Navigator.pop(context);
           setState(() {
             _cilcuralIndicator = false;
           });
-        }).catchError((error){
-           /*how daialog when saving in firestore in products provider trows error*/
-          return showDialog(context: context, builder: (context)=> AlertDialog(
-            title: const  Text('Error occured while saving the data to data base'),
-            actions: [
-              TextButton(onPressed: (){
-                 /*go back to user product */
-                Navigator.of(context).pushNamed(UserProductsScreen.routeName);
-              }, child: Text('OK!'))
-            ],
-          ));
+        }).catchError((error) {
+          /*how daialog when saving in firestore in products provider trows error*/
+          return showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                    title: const Text(
+                        'Error occured while saving the data to data base'),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            /*go back to user product */
+                            Navigator.of(context)
+                                .pushNamed(UserProductsScreen.routeName);
+                          },
+                          child: Text('OK!'))
+                    ],
+                  ));
         });
       }
     }
@@ -185,7 +194,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         TextFormField(
                           onSaved: (value) {
                             _editedProduct = Product(
-                                id: productProperties[ProductE.id]??'',
+                                id: productProperties[ProductE.id] ?? '',
                                 title: value ?? '',
                                 description: _editedProduct.description,
                                 price: _editedProduct.price,

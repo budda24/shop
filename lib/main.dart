@@ -12,6 +12,7 @@ import 'providers/products_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
 import 'screeans/orders_screen.dart';
+import 'screeans/splash_screen.dart';
 import 'screeans/user_producs_screen.dart';
 
 void main() async {
@@ -28,23 +29,28 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<Auth,Products>(
           create:(_)=>Products(),
-          update: (_, auth, priviousproduct ) => Products(token: auth.token),
+          update: (_, auth, priviousproduct ) => Products(token: auth.token, userId: auth.userId),
         ),
-        ChangeNotifierProvider(
-          create: (context) => Cart(),
+        /* to extend provider with other provider below on the widget tree */
+         ChangeNotifierProxyProvider<Auth,Cart>(
+          create:(_)=> Cart(),
+          update: (context, auth,_)=> Cart(auth: auth),
         ),
         ChangeNotifierProvider(
           create: (_) => Orders(),
         ),
       ],
       child: Consumer<Auth>(builder: (context, value, _) {
-        /* print(value.userIsAuthenticated); */
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'MyShop',
-          home: !value.userIsAuthenticated
-              ? AuthScreen()
-              : ProductsScreean(),
+          /* checking if user is auth. if not returning future builder trigering auto login where the shared_preferences will be checket for valid auth. data */
+          home: !value.userIsAuthenticated? FutureBuilder(future: value.checkLogIn(),
+         /*  if future return true ConnectionState == done */
+           builder: (context, snapshot) =>snapshot.connectionState == ConnectionState.waiting
+          ? SplashScreen()
+          : ProductsScreean())
+          :ProductsScreean(),
           routes: {
             ProductsScreean.id: (ctx) => ProductsScreean(),
             ProductDetails.id: (ctx) => ProductDetails(),

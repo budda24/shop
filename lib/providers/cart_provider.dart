@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shop/providers/product.dart';
 
+import 'auth_provider.dart';
+
 class CartItem {
   final String id;
   final String title;
@@ -23,6 +25,9 @@ class CartItem {
 }
 
 class Cart extends ChangeNotifier {
+  Auth? auth;
+  Cart({this.auth});
+
   Map<String, CartItem> _items = {};
 
   Map<String, CartItem> get items {
@@ -44,7 +49,7 @@ class Cart extends ChangeNotifier {
   Future<http.Response> fetchAlbum() {
     return http
         .get(Uri.parse(
-            'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts.json'))
+            'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${auth!.userId}.json?auth=${auth!.token}'))
         .catchError((onError) => print(onError));
   }
 
@@ -68,7 +73,7 @@ class Cart extends ChangeNotifier {
   Future<void> addItem(Product product) {
 /* using the product id as a key of documemt */
     final uri = Uri.parse(
-        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${product.id}.json');
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${auth!.userId}/${product.id}.json?auth=${auth!.token}');
     /* using patch for creating new document with given id */
     return http
         .patch(
@@ -104,7 +109,7 @@ class Cart extends ChangeNotifier {
     _items[product.id]!.addQuantity();
 
     final uri = Uri.parse(
-        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${product.id}.json');
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${auth!.userId}/${product.id}.json?auth=${auth!.token}');
     return http
         .patch(
       uri,
@@ -129,7 +134,7 @@ class Cart extends ChangeNotifier {
 
   deleteItem(String id) {
     final uri = Uri.parse(
-        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${id}.json');
+        'https://shop-8956a-default-rtdb.europe-west1.firebasedatabase.app/cartProducts/${auth!.userId}/${id}.json?auth=${auth!.token}');
     http
         .delete(
       uri,
